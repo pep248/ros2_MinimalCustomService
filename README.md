@@ -11,7 +11,7 @@ When an integer is provided it simply counts up to said integer, providing the a
 * Inside the [custom_service](custom_service) folder, we can find the package with the custom service definition
 * Inside the [minimal_service](minimal_service) folder, we can find the codes for both, the service server and the client server files as well as the python launch file to launch both.
 
-## Commands![Uploading images.jpg…]()
+## Commands
 
 To download this repo and run the mentioned nodes, use the following commands:
 
