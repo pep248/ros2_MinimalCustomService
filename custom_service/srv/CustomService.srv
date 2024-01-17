@@ -1,0 +1,10 @@
+# Important that the file_name starts with capital letter and has no symbols
+# Except the first letter, each other capital letter will be replaced with _ when including the custome message:
+# example: #include "custom_service/srv/custom_service.hpp"
+
+# Request
+string word1
+string word2
+---
+# Result
+string resulting_word
