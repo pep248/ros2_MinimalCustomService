@@ -1,22 +1,28 @@
 #include <minimal_service/minimal_service_client_class.hpp>
 
-using namespace std;
-
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
-    rclcpp::init(argc, argv);
-    // Create an instance of the MinimalActionClient()
-    auto service_client = std::make_shared<MinimalServiceServer>();
+  rclcpp::init(argc, argv);
 
-    // Create an executor and put the service_client inside
-    rclcpp::executors::MultiThreadedExecutor executor;
-    executor.add_node(service_client);
-    // Send the goal
-    service_client->send_goal(10);
+  // Create an instance of the MinimalServiceClient
+  auto service_client = std::make_shared<MinimalServiceClient>();
 
-    // Check if the service was successful and kill the node once finished
-    executor.spin();
+  // 1 time execution, so no executor needed
 
-    rclcpp::shutdown();
-    return 0;
+  // Make a request
+  std::string word1 = "Hello ";
+  std::string word2 = "ROS";
+  auto result = service_client->makeRequest(word1, word2);
+
+  if (result) {
+    RCLCPP_INFO(rclcpp::get_logger("minimal_service_client_node"), "Result: %s", result->resulting_word.c_str());
+  } else {
+    RCLCPP_ERROR(rclcpp::get_logger("minimal_service_client_node"), "Service call failed");
+  }
+
+  rclcpp::shutdown();
+  return 0;
 }
+
+
+

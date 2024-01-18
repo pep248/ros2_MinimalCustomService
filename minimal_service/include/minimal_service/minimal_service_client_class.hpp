@@ -1,35 +1,23 @@
-#ifndef MINIMAL_ACTION_CLIENT_HPP_
-#define MINIMAL_ACTION_CLIENT_HPP_
+#ifndef MINIMAL_SERVICE_CLIENT_CLASS_HPP_
+#define MINIMAL_SERVICE_CLIENT_CLASS_HPP_
 
-#include <iostream>
+#include <memory>
+#include <string>
 
 #include "rclcpp/rclcpp.hpp"
-#include "rclcpp_action/rclcpp_action.hpp"
+#include "custom_service/srv/custom_service.hpp"
 
-#include "custom_action/action/custom_action.hpp"
-
-
-class MinimalActionClient : public rclcpp::Node
+class MinimalServiceClient : public rclcpp::Node
 {
 public:
-  // CustomAction class
-  using CustomAction = custom_action::action::CustomAction;
-  // GoalHandle class (handles the accept, the cancel, and the execute functions)
-  using GoalHandle = rclcpp_action::ClientGoalHandle<CustomAction>;
+  MinimalServiceClient();
 
-  explicit MinimalActionClient(const rclcpp::NodeOptions &node_options = rclcpp::NodeOptions());
-
-  void send_goal(int objective);
+  std::shared_ptr<custom_service::srv::CustomService::Response> makeRequest(
+    const std::string& word1,
+    const std::string& word2);
 
 private:
-  rclcpp_action::Client<CustomAction>::SharedPtr client_ptr_;
-
-  // Response Callback
-  void goal_response_callback(GoalHandle::SharedPtr goal_message);
-  // Feedback Callback
-  void feedback_callback(GoalHandle::SharedPtr, const std::shared_ptr<const CustomAction::Feedback> feedback_message);
-  // Result Callback
-  void result_callback(const GoalHandle::WrappedResult &result_message);
+  rclcpp::Client<custom_service::srv::CustomService>::SharedPtr client_;
 };
 
-#endif  // MINIMAL_ACTION_CLIENT_HPP_
+#endif  // MINIMAL_SERVICE_CLIENT_CLASS_HPP_

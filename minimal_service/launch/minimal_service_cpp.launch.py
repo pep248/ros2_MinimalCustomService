@@ -4,17 +4,17 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     return LaunchDescription([
-        # Launch the action server node
+        # Launch the service server node
         Node(
-            package='minimal_action',
-            executable='minimal_action_server',
+            package='minimal_service',
+            executable='minimal_service_server',
             output='screen'
         ),
 
-        # Launch the action client node
+        # Launch the service client node
         Node(
-            package='minimal_action',
-            executable='minimal_action_client',
+            package='minimal_service',
+            executable='minimal_service_client',
             output='screen'
         ),
     ])

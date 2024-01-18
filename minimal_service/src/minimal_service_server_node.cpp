@@ -1,13 +1,13 @@
-#include <minimal_action/minimal_action_server_class.hpp>
+#include <minimal_service/minimal_service_server_class.hpp>
 
 int main(int argc, char **argv)
 {
     rclcpp::init(argc, argv);
 
-    auto action_server = std::make_shared<MinimalActionServer>();
+    auto service_server = std::make_shared<MinimalServiceServer>();
 
     rclcpp::executors::MultiThreadedExecutor executor;
-    executor.add_node(action_server);
+    executor.add_node(service_server);
     executor.spin();
 
     rclcpp::shutdown();

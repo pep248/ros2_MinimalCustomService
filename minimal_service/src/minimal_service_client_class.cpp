@@ -1,61 +1,33 @@
-#include "minimal_service/srv/minimal_service.hpp"
-#include "rclcpp/rclcpp.hpp"
+#include <minimal_service/minimal_service_client_class.hpp>
 
-class MinimalServiceClient : public rclcpp::Node
+MinimalServiceClient::MinimalServiceClient() : Node("minimal_service_client")
 {
-public:
-  MinimalServiceClient()
-    : Node("minimal_service_client")
-  {
-    // Create the client
-    client_ = this->create_client<minimal_service::srv::MinimalService>("concatenate_words");
+  client_ = this->create_client<custom_service::srv::CustomService>("concatenate_words");
 
-    // Wait for the service to be available
-    while (!client_->wait_for_service(std::chrono::seconds(1))) {
-      if (!rclcpp::ok()) {
-        RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for the service. Exiting.");
-        return;
-      }
-      RCLCPP_INFO(this->get_logger(), "Service not available, waiting...");
+  while (!client_->wait_for_service(std::chrono::seconds(1))) {
+    if (!rclcpp::ok()) {
+      RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for the service. Exiting.");
+      return;
     }
-
-    // Call the service
-    auto request = std::make_shared<minimal_service::srv::MinimalService::Request>();
-    request->word1 = "Hello";
-    request->word2 = "ROS";
-
-    auto result = call_service(request);
-
-    if (result) {
-      RCLCPP_INFO(this->get_logger(), "Result: %s", result->resulting_word.c_str());
-    } else {
-      RCLCPP_ERROR(this->get_logger(), "Service call failed");
-    }
+    RCLCPP_INFO(this->get_logger(), "Service not available, waiting...");
   }
+}
 
-private:
-  std::shared_ptr<minimal_service::srv::MinimalService::Response> call_service(
-    const std::shared_ptr<minimal_service::srv::MinimalService::Request> request)
+std::shared_ptr<custom_service::srv::CustomService::Response> MinimalServiceClient::makeRequest(
+  const std::string& word1,
+  const std::string& word2)
+{
+  auto request = std::make_shared<custom_service::srv::CustomService::Request>();
+  request->word1 = word1;
+  request->word2 = word2;
+
+  auto result = client_->async_send_request(request);
+  if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), result) ==
+      rclcpp::FutureReturnCode::SUCCESS)
   {
-    // Create a promise and a future to get the result asynchronously
-    auto promise_result = std::make_shared<std::promise<std::shared_ptr<minimal_service::srv::MinimalService::Response>>>();
-    auto future_result = promise_result->get_future();
-
-    // Make the service call
-    auto request_handle = client_->async_send_request(request, [promise_result](rclcpp::Client<minimal_service::srv::MinimalService>::SharedFuture future) {
-      if (future.valid()) {
-        promise_result->set_value(future.get());
-      } else {
-        promise_result->set_value(nullptr);
-      }
-    });
-
-    // Wait for the result
-    rclcpp::spin_until_future_complete(this->get_node_base_interface(), future_result);
-
-    // Return the result
-    return future_result.get();
+    return result.get();
+  } else {
+    RCLCPP_ERROR(this->get_logger(), "Service call failed");
+    return nullptr;
   }
-
-  rclcpp::Client<minimal_service::srv::MinimalService>::SharedPtr client_;
-};
+}
